@@ -94,11 +94,13 @@
             align-items: center;
             text-align: center;
             transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
         }
 
         .card:hover {
             transform: translateY(-4px);
             box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+            border-color: var(--accent-color);
         }
 
         .card img.profile-img {
@@ -166,6 +168,104 @@
             line-height: 1.4;
         }
 
+        /* MODAL POPUP DETAIL PROFIL */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-card {
+            background: white;
+            width: 90%;
+            max-width: 450px;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            position: relative;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-card {
+            transform: translateY(0);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: #f1f5f9;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-size: 16px;
+            cursor: pointer;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .modal-close:hover {
+            background: #e2e8f0;
+            color: var(--primary-color);
+        }
+
+        .modal-img {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #f1f5f9;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        /* FLOATING POPUP "HALO" (Menghilang saat scroll) */
+        .halo-popup {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 30px;
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3);
+            font-weight: 700;
+            font-size: 16px;
+            z-index: 999;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .halo-popup.hidden {
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+        }
+
         footer {
             text-align: center;
             padding: 20px;
@@ -178,18 +278,22 @@
 </head>
 <body>
 
-    <!-- LOGO ANGKATAN -->
-    <header style="position: relative;">
-        <!-- Tombol Navigasi di Pojok Kanan Atas -->
-        <div style="position: absolute; top: 20px; right: 30px;">
-            <a href="peta.html" style="background-color: #2563eb; color: white; padding: 8px 18px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 600; box-shadow: 0 2px 6px rgba(37,99,235,0.2);">
-                🗺️ Peta Sebaran Mahasiswa GT23
-            </a>
-        </div>
+    <!-- POP-UP "HALO" -->
+    <div id="haloPopup" class="halo-popup">
+        👋 HALO! Selamat datang di Direktori Geomatika '23
+    </div>
 
+    <!-- LOGO ANGKATAN -->
+    <header>
         <img src="assets/Logo-Angkatan.jpg" alt="Logo Angkatan Geomatika 23" onerror="this.src='https://via.placeholder.com/130?text=LOGO'">
         <h1>Teknik Geomatika 23</h1>
         <p>Direktori Biodata Resmi Mahasiswa Teknik Geomatika Angkatan 2023</p>
+        
+        <div style="margin-top: 20px;">
+            <a href="peta.html" style="background-color: var(--accent-color); color: white; padding: 10px 22px; border-radius: 30px; text-decoration: none; font-size: 14px; font-weight: 600; box-shadow: 0 4px 10px rgba(37,99,235,0.2);">
+                🗺️ Lihat Peta Sebaran Asal Mahasiswa
+            </a>
+        </div>
     </header>
 
     <!-- KOTAK PENCARIAN -->
@@ -202,6 +306,31 @@
         <p style="grid-column: 1 / -1; text-align: center; color: var(--text-muted);">Memuat data mahasiswa...</p>
     </div>
 
+    <!-- MODAL DETAIL PROFIL -->
+    <div id="profileModal" class="modal-overlay" onclick="closeModal(event)">
+        <div class="modal-card" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeModal()">×</button>
+            <img id="modalImg" src="" alt="Foto Profil" class="modal-img" onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'">
+            <h2 id="modalNama" style="margin: 0 0 5px 0; color: var(--primary-color); font-size: 20px;"></h2>
+            <div id="modalNim" class="nim"></div>
+            
+            <div class="info-group" style="margin-top: 15px;">
+                <div class="info-row">
+                    <span class="info-label">Program Studi</span>
+                    <span id="modalProdi" class="info-value"></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Kelas TPB</span>
+                    <span id="modalTpb" class="info-value"></span>
+                </div>
+            </div>
+            
+            <div class="alamat" style="margin-top: 15px; font-size: 13px;">
+                📍 <b>Alamat Asal Lengkap:</b><br><span id="modalAlamat"></span>
+            </div>
+        </div>
+    </div>
+
     <footer>
         &copy; 2026 Teknik Geomatika 23 | Dibuat dan disesuaikan oleh 123230055 dan 123230070
     </footer>
@@ -211,14 +340,13 @@
 
         async function loadDatabase() {
             try {
-                let response = await fetch('data/database2.csv'); // Sesuaikan jika nama file Anda database.csv atau database2.csv
+                let response = await fetch('data/database2.csv');
                 let text = await response.text();
                 
                 let rows = text.split('\n').filter(r => r.trim() !== '');
                 if (rows.length === 0) return;
 
                 for (let i = 1; i < rows.length; i++) {
-                    // Pemisah menggunakan titik koma (;) sesuai struktur asli file CSV
                     let cols = rows[i].split(';').map(c => c.trim().replace(/^"|"$/g, ''));
                     if (cols.length >= 6 && cols[1]) {
                         allMembers.push({
@@ -251,11 +379,13 @@
             }
 
             members.forEach(m => {
-                // Foto dipanggil berdasarkan NIM (contoh: assets/123230001.jpg)
                 let fotoPath = `assets/${m.nim}.jpg`;
 
                 let card = document.createElement('div');
                 card.className = 'card';
+                // Ketika kartu diklik, jalankan fungsi showDetail
+                card.onclick = () => showDetail(m);
+
                 card.innerHTML = `
                     <img src="${fotoPath}" alt="${m.nama}" class="profile-img" onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'">
                     <h3>${m.nama}</h3>
@@ -280,6 +410,23 @@
             });
         }
 
+        // Fungsi Menampilkan Modal Detail Profil
+        function showDetail(m) {
+            document.getElementById('modalImg').src = `assets/${m.nim}.jpg`;
+            document.getElementById('modalNama').innerText = m.nama;
+            document.getElementById('modalNim').innerText = m.nim;
+            document.getElementById('modalProdi').innerText = m.prodi;
+            document.getElementById('modalTpb').innerText = m.tpb;
+            document.getElementById('modalAlamat').innerText = m.alamat;
+
+            document.getElementById('profileModal').classList.add('active');
+        }
+
+        // Fungsi Menutup Modal Detail Profil
+        function closeModal() {
+            document.getElementById('profileModal').classList.remove('active');
+        }
+
         function filterData() {
             let keyword = document.getElementById('searchInput').value.toLowerCase();
             let filtered = allMembers.filter(m => 
@@ -287,6 +434,16 @@
             );
             displayMembers(filtered);
         }
+
+        // Script Pop-up "HALO" menghilang saat scroll ke bawah
+        window.addEventListener('scroll', function() {
+            let haloPopup = document.getElementById('haloPopup');
+            if (window.scrollY > 50) {
+                haloPopup.classList.add('hidden');
+            } else {
+                haloPopup.classList.remove('hidden');
+            }
+        });
 
         loadDatabase();
     </script>
