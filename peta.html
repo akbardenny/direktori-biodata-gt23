@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peta Sebaran Mahasiswa - Geomatika 23</title>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        :root {
+            --primary-color: #0f172a;
+            --accent-color: #2563eb;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #334155;
+            --text-muted: #64748b;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+            color: var(--text-main);
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: var(--card-bg);
+            border-bottom: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 22px;
+            color: var(--primary-color);
+        }
+
+        .nav-btn {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .nav-btn:hover {
+            background-color: #1d4ed8;
+        }
+
+        .stats-box {
+            max-width: 1200px;
+            margin: 30px auto 10px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 18px 20px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .stat-card h3 {
+            margin: 0;
+            font-size: 26px;
+            color: var(--accent-color);
+        }
+
+        .stat-card p {
+            margin: 5px 0 0 0;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .map-container {
+            max-width: 1200px;
+            margin: 20px auto 50px auto;
+            padding: 0 20px;
+        }
+
+        #map {
+            width: 100%;
+            height: 600px;
+            border-radius: 14px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-muted);
+            font-size: 13px;
+            border-top: 1px solid #e2e8f0;
+            background: white;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>📍 Peta Sebaran Asal Mahasiswa Geomatika '23</h1>
+        <a href="index.html" class="nav-btn">← Kembali ke Direktori</a>
+    </header>
+
+    <!-- KOTAK STATISTIK -->
+    <div class="stats-box">
+        <div class="stat-card">
+            <h3 id="totalMapped">0</h3>
+            <p>Total Mahasiswa Terpetakan</p>
+        </div>
+        <div class="stat-card">
+            <h3 id="totalRegions">0</h3>
+            <p>Wilayah / Provinsi Asal</p>
+        </div>
+    </div>
+
+    <!-- PETA INTERAKTIF -->
+    <div class="map-container">
+        <div id="map"></div>
+    </div>
+
+    <footer>
+        &copy; 2026 Teknik Geomatika 23 | Dibuat dan disesuaikan oleh 123230055 dan 123230070
+    </footer>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Inisialisasi Peta berpusat di Indonesia
+        var map = L.map('map').setView([-2.5489, 118.0149], 5);
+
+        // Tile layer OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Titik koordinat pusat wilayah/provinsi rujukan
+        const regionCoords = {
+            'Lampung': [-5.4297, 105.2611],
+            'Sumatera Selatan': [-3.3194, 104.9144],
+            'Sumatera Utara': [3.5952, 98.6722],
+            'Riau': [0.5071, 101.4478],
+            'Jambi': [-1.6101, 103.6131],
+            'Sumatera Barat': [-0.9471, 100.4172],
+            'Jakarta': [-6.2088, 106.8456],
+            'Jawa Barat': [-6.9175, 107.6191],
+            'Banten': [-6.1154, 106.1503],
+            'Yogyakarta': [-7.7956, 110.3695],
+            'Jawa Tengah': [-7.1509, 110.1403],
+            'Jawa Timur': [-7.2575, 112.7521],
+            'Lainnya': [-2.5489, 118.0149]
+        };
+
+        function getRegion(addr) {
+            if (!addr) return 'Lainnya';
+            let a = addr.toLowerCase();
+            if (a.includes('lampung') || a.includes('metro') || a.includes('pringsewu') || a.includes('tanggamus') || a.includes('pesawaran') || a.includes('mesuji') || a.includes('tulang bawang') || a.includes('way kanan') || a.includes('lambar') || a.includes('liwa') || a.includes('seputih')) return 'Lampung';
+            if (a.includes('palembang') || a.includes('banyuasin') || a.includes('musi') || a.includes('ogan') || a.includes('prabumulih') || a.includes('lubuklinggau') || a.includes('lahat')) return 'Sumatera Selatan';
+            if (a.includes('medan') || a.includes('deli serdang') || a.includes('toba') || a.includes('asahan') || a.includes('binjai') || a.includes('siantar') || a.includes('karo') || a.includes('tanjung morawa') || a.includes('balige')) return 'Sumatera Utara';
+            if (a.includes('pekanbaru') || a.includes('dumai') || a.includes('kampar') || a.includes('bengkalis') || a.includes('siak') || a.includes('rokan') || a.includes('riau')) return 'Riau';
+            if (a.includes('jambi') || a.includes('batanghari') || a.includes('bungo') || a.includes('kerinci') || a.includes('merangin') || a.includes('tebo')) return 'Jambi';
+            if (a.includes('padang') || a.includes('bukittinggi') || a.includes('payakumbuh') || a.includes('pasaman') || a.includes('lima puluh kota') || a.includes('agam') || a.includes('solok')) return 'Sumatera Barat';
+            if (a.includes('jakarta') || a.includes('jaksel') || a.includes('jaktim') || a.includes('jakpus') || a.includes('jakbar') || a.includes('jakut')) return 'Jakarta';
+            if (a.includes('bogor') || a.includes('bekasi') || a.includes('depok') || a.includes('bandung') || a.includes('cirebon') || a.includes('sukabumi') || a.includes('karawang') || a.includes('tasikmalaya') || a.includes('jawa barat') || a.includes('bintara')) return 'Jawa Barat';
+            if (a.includes('tangerang') || a.includes('serang') || a.includes('cilegon') || a.includes('banten')) return 'Banten';
+            if (a.includes('yogyakarta') || a.includes('jogja') || a.includes('bantul') || a.includes('sleman')) return 'Yogyakarta';
+            if (a.includes('jawa tengah') || a.includes('semarang') || a.includes('surakarta') || a.includes('solo') || a.includes('magelang')) return 'Jawa Tengah';
+            if (a.includes('jawa timur') || a.includes('surabaya') || a.includes('malang') || a.includes('sidoarjo')) return 'Jawa Timur';
+            return 'Lainnya';
+        }
+
+        async function loadMapData() {
+            try {
+                let response = await fetch('data/database2.csv');
+                let text = await response.text();
+                let rows = text.split('\n').filter(r => r.trim() !== '');
+                if (rows.length === 0) return;
+
+                let regionCounts = {};
+                let totalCount = 0;
+
+                for (let i = 1; i < rows.length; i++) {
+                    let cols = rows[i].split(';').map(c => c.trim().replace(/^"|"$/g, ''));
+                    if (cols.length >= 6 && cols[1]) {
+                        let nim = cols[1];
+                        let nama = cols[2];
+                        let alamat = cols[5] || '-';
+                        let region = getRegion(alamat);
+
+                        totalCount++;
+                        regionCounts[region] = (regionCounts[region] || 0) + 1;
+
+                        let baseCoord = regionCoords[region] || regionCoords['Lainnya'];
+
+                        // Tambahkan sedikit variasi acak (jitter) agar marker tidak bertumpuk di titik persis yang sama
+                        let lat = baseCoord[0] + (Math.random() - 0.5) * 0.08;
+                        let lng = baseCoord[1] + (Math.random() - 0.5) * 0.08;
+
+                        let marker = L.marker([lat, lng]).addTo(map);
+                        marker.bindPopup(`
+                            <div style="font-family: 'Segoe UI', sans-serif;">
+                                <b style="font-size: 14px; color: #0f172a;">${nama}</b><br>
+                                <span style="color: #2563eb; font-weight: 600; font-size: 12px;">${nim}</span>
+                                <hr style="margin: 6px 0; border: none; border-top: 1px solid #e2e8f0;">
+                                <span style="font-size: 12px; color: #64748b;">📍 ${alamat}</span>
+                            </div>
+                        `);
+                    }
+                }
+
+                document.getElementById('totalMapped').innerText = totalCount;
+                document.getElementById('totalRegions').innerText = Object.keys(regionCounts).length;
+
+            } catch (error) {
+                console.error("Gagal memuat data peta:", error);
+            }
+        }
+
+        loadMapData();
+    </script>
+</body>
+</html>
