@@ -124,7 +124,7 @@
         </div>
         <div class="stat-card">
             <h3 id="totalRegions">0</h3>
-            <p>Wilayah / Provinsi Asal</p>
+            <p>Wilayah / Kabupaten Asal</p>
         </div>
     </div>
 
@@ -149,39 +149,105 @@
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
 
-        // Titik koordinat pusat wilayah/provinsi rujukan
-        const regionCoords = {
-            'Lampung': [-5.4297, 105.2611],
-            'Sumatera Selatan': [-3.3194, 104.9144],
-            'Sumatera Utara': [3.5952, 98.6722],
-            'Riau': [0.5071, 101.4478],
-            'Jambi': [-1.6101, 103.6131],
-            'Sumatera Barat': [-0.9471, 100.4172],
-            'Jakarta': [-6.2088, 106.8456],
-            'Jawa Barat': [-6.9175, 107.6191],
-            'Banten': [-6.1154, 106.1503],
-            'Yogyakarta': [-7.7956, 110.3695],
-            'Jawa Tengah': [-7.1509, 110.1403],
-            'Jawa Timur': [-7.2575, 112.7521],
-            'Lainnya': [-2.5489, 118.0149]
+        // Kamus Koordinat Wilayah Pasti (Kabupaten / Kota / Kecamatan Utama)
+        const locationCoords = {
+            // Lampung
+            'bandar lampung': [-5.4297, 105.2611],
+            'lampung tengah': [-4.9126, 105.2289],
+            'lampung selatan': [-5.7317, 105.5779],
+            'lampung utara': [-4.8217, 104.7089],
+            'lampung timur': [-5.1147, 105.5847],
+            'lampung barat': [-5.0489, 104.3581],
+            'pesawaran': [-5.3853, 105.1556],
+            'pringsewu': [-5.3589, 104.9750],
+            'tanggamus': [-5.4578, 104.6644],
+            'metro': [-5.1131, 105.3056],
+            'tulang bawang': [-4.4758, 105.3581],
+            'way kanan': [-4.5039, 104.5117],
+            'mesuji': [-4.0433, 105.4417],
+            'pesisir barat': [-5.1931, 103.9497],
+            'tanjung senang': [-5.3789, 105.2817],
+            'haji mena': [-5.3589, 105.2319],
+            'natar': [-5.2667, 105.2167],
+            'kedaton': [-5.3900, 105.2500],
+            'bumi ratu': [-4.9833, 105.2167],
+            'labuhan ratu': [-5.3850, 105.2600],
+            'rajabasa': [-5.3850, 105.2600],
+
+            // Sumatera Selatan
+            'palembang': [-2.9909, 104.7565],
+            'banyuasin': [-2.8833, 104.3833],
+            'musi banyuasin': [-2.4833, 103.7500],
+            'ogan ilir': [-3.2333, 104.6833],
+            'ogan komering ilir': [-3.3833, 105.0000],
+            'ogan komering ulu': [-4.1333, 104.1667],
+            'prabumulih': [-3.4333, 104.2333],
+            'lubuklinggau': [-3.3000, 102.8667],
+            'lahat': [-3.7833, 103.5333],
+            'baturaja': [-3.1333, 104.1667],
+            'muara enim': [-3.6500, 103.7833],
+
+            // Sumatera Utara & Aceh
+            'medan': [3.5952, 98.6722],
+            'deli serdang': [3.4167, 98.8333],
+            'toba': [2.3333, 99.2333],
+            'balige': [2.3333, 99.2333],
+            'asahan': [2.9833, 99.6167],
+            'binjai': [3.6000, 98.4833],
+            'pematangsiantar': [2.9667, 99.0667],
+            'tapanuli': [1.8333, 98.9167],
+            'karo': [3.1000, 98.5000],
+            'humbang hasundutan': [2.2500, 98.5000],
+            'dairi': [2.8333, 98.3333],
+            'sidikalang': [2.7483, 98.3106],
+
+            // Riau & Kepri
+            'pekanbaru': [0.5071, 101.4478],
+            'dumai': [1.6833, 101.4500],
+            'kampar': [0.3333, 101.0000],
+            'bengkalis': [1.4667, 102.1167],
+            'siak': [0.7833, 102.0500],
+            'bintan': [1.0833, 104.5333],
+            'tanjung pinang': [0.9167, 104.4500],
+            'duri': [1.2500, 101.2167],
+            'mandau': [1.2667, 101.2333],
+
+            // Jambi
+            'jambi': [-1.6101, 103.6131],
+            'batanghari': [-1.7500, 103.3833],
+            'bungo': [-1.4833, 102.1167],
+
+            // Sumatera Barat
+            'padang': [-0.9471, 100.4172],
+            'bukittinggi': [-0.3056, 100.3692],
+            'payakumbuh': [-0.2292, 100.6306],
+            'pasaman': [0.1500, 100.1667],
+            'lima puluh kota': [-0.1667, 100.6667],
+            'sijunjung': [-0.6833, 100.9333],
+            'agam': [-0.2333, 100.2333],
+            'tanah datar': [-0.4500, 100.5833],
+
+            // Jawa, Jakarta, Banten
+            'jakarta': [-6.2088, 106.8456],
+            'bogor': [-6.5971, 106.7996],
+            'bojonggede': [-6.4447, 106.7903],
+            'bekasi': [-6.2383, 106.9756],
+            'depok': [-6.4025, 106.8186],
+            'bandung': [-6.9175, 107.6191],
+            'tangerang': [-6.1783, 106.6319],
+            'serang': [-6.1154, 106.1503],
+            'karawang': [-6.3, 107.3]
         };
 
-        function getRegion(addr) {
-            if (!addr) return 'Lainnya';
+        function getCoordinates(addr) {
+            if (!addr || addr === '-') return null;
             let a = addr.toLowerCase();
-            if (a.includes('lampung') || a.includes('metro') || a.includes('pringsewu') || a.includes('tanggamus') || a.includes('pesawaran') || a.includes('mesuji') || a.includes('tulang bawang') || a.includes('way kanan') || a.includes('lambar') || a.includes('liwa') || a.includes('seputih')) return 'Lampung';
-            if (a.includes('palembang') || a.includes('banyuasin') || a.includes('musi') || a.includes('ogan') || a.includes('prabumulih') || a.includes('lubuklinggau') || a.includes('lahat')) return 'Sumatera Selatan';
-            if (a.includes('medan') || a.includes('deli serdang') || a.includes('toba') || a.includes('asahan') || a.includes('binjai') || a.includes('siantar') || a.includes('karo') || a.includes('tanjung morawa') || a.includes('balige')) return 'Sumatera Utara';
-            if (a.includes('pekanbaru') || a.includes('dumai') || a.includes('kampar') || a.includes('bengkalis') || a.includes('siak') || a.includes('rokan') || a.includes('riau')) return 'Riau';
-            if (a.includes('jambi') || a.includes('batanghari') || a.includes('bungo') || a.includes('kerinci') || a.includes('merangin') || a.includes('tebo')) return 'Jambi';
-            if (a.includes('padang') || a.includes('bukittinggi') || a.includes('payakumbuh') || a.includes('pasaman') || a.includes('lima puluh kota') || a.includes('agam') || a.includes('solok')) return 'Sumatera Barat';
-            if (a.includes('jakarta') || a.includes('jaksel') || a.includes('jaktim') || a.includes('jakpus') || a.includes('jakbar') || a.includes('jakut')) return 'Jakarta';
-            if (a.includes('bogor') || a.includes('bekasi') || a.includes('depok') || a.includes('bandung') || a.includes('cirebon') || a.includes('sukabumi') || a.includes('karawang') || a.includes('tasikmalaya') || a.includes('jawa barat') || a.includes('bintara')) return 'Jawa Barat';
-            if (a.includes('tangerang') || a.includes('serang') || a.includes('cilegon') || a.includes('banten')) return 'Banten';
-            if (a.includes('yogyakarta') || a.includes('jogja') || a.includes('bantul') || a.includes('sleman')) return 'Yogyakarta';
-            if (a.includes('jawa tengah') || a.includes('semarang') || a.includes('surakarta') || a.includes('solo') || a.includes('magelang')) return 'Jawa Tengah';
-            if (a.includes('jawa timur') || a.includes('surabaya') || a.includes('malang') || a.includes('sidoarjo')) return 'Jawa Timur';
-            return 'Lainnya';
+            for (let key in locationCoords) {
+                if (a.includes(key)) {
+                    return locationCoords[key];
+                }
+            }
+            return null;
         }
 
         async function loadMapData() {
@@ -200,26 +266,24 @@
                         let nim = cols[1];
                         let nama = cols[2];
                         let alamat = cols[5] || '-';
-                        let region = getRegion(alamat);
 
-                        totalCount++;
-                        regionCounts[region] = (regionCounts[region] || 0) + 1;
+                        let coords = getCoordinates(alamat);
+                        if (coords) {
+                            totalCount++;
+                            // Gunakan nama key wilayah yang cocok untuk statistik
+                            let matchedKey = Object.keys(locationCoords).find(k => alamat.toLowerCase().includes(k)) || 'Lainnya';
+                            regionCounts[matchedKey] = (regionCounts[matchedKey] || 0) + 1;
 
-                        let baseCoord = regionCoords[region] || regionCoords['Lainnya'];
-
-                        // Tambahkan sedikit variasi acak (jitter) agar marker tidak bertumpuk di titik persis yang sama
-                        let lat = baseCoord[0] + (Math.random() - 0.5) * 0.08;
-                        let lng = baseCoord[1] + (Math.random() - 0.5) * 0.08;
-
-                        let marker = L.marker([lat, lng]).addTo(map);
-                        marker.bindPopup(`
-                            <div style="font-family: 'Segoe UI', sans-serif;">
-                                <b style="font-size: 14px; color: #0f172a;">${nama}</b><br>
-                                <span style="color: #2563eb; font-weight: 600; font-size: 12px;">${nim}</span>
-                                <hr style="margin: 6px 0; border: none; border-top: 1px solid #e2e8f0;">
-                                <span style="font-size: 12px; color: #64748b;">📍 ${alamat}</span>
-                            </div>
-                        `);
+                            let marker = L.marker(coords).addTo(map);
+                            marker.bindPopup(`
+                                <div style="font-family: 'Segoe UI', sans-serif;">
+                                    <b style="font-size: 14px; color: #0f172a;">${nama}</b><br>
+                                    <span style="color: #2563eb; font-weight: 600; font-size: 12px;">${nim}</span>
+                                    <hr style="margin: 6px 0; border: none; border-top: 1px solid #e2e8f0;">
+                                    <span style="font-size: 12px; color: #64748b;">📍 ${alamat}</span>
+                                </div>
+                            `);
+                        }
                     }
                 }
 
