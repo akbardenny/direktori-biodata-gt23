@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Direktori Biodata - Geomatika 23</title>
+    <style>
+        :root {
+            --primary-color: #0f172a;
+            --accent-color: #2563eb;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #334155;
+            --text-muted: #64748b;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+            color: var(--text-main);
+        }
+
+        header {
+            text-align: center;
+            padding: 50px 20px;
+            background: var(--card-bg);
+            border-bottom: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        header img {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #f1f5f9;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 28px;
+            color: var(--primary-color);
+        }
+
+        header p {
+            color: var(--text-muted);
+            margin-top: 8px;
+            font-size: 16px;
+        }
+
+        .search-container {
+            max-width: 600px;
+            margin: 30px auto 10px auto;
+            padding: 0 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 20px;
+            font-size: 15px;
+            border: 1px solid #cbd5e1;
+            border-radius: 30px;
+            outline: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            transition: all 0.3s;
+        }
+
+        .search-input:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto 50px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 14px;
+            padding: 24px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+        }
+
+        .card img.profile-img {
+            width: 85px;
+            height: 85px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 14px;
+            border: 2px solid #e2e8f0;
+            background: #f1f5f9;
+        }
+
+        .card h3 {
+            margin: 0 0 4px 0;
+            font-size: 17px;
+            color: var(--primary-color);
+        }
+
+        .nim {
+            font-size: 13px;
+            color: var(--accent-color);
+            font-weight: 600;
+            margin-bottom: 12px;
+            background: #eff6ff;
+            padding: 3px 10px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .info-group {
+            width: 100%;
+            text-align: left;
+            font-size: 13px;
+            border-top: 1px solid #f1f5f9;
+            padding-top: 10px;
+            margin-top: 5px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        .info-label {
+            color: var(--text-muted);
+        }
+
+        .info-value {
+            font-weight: 500;
+            color: var(--primary-color);
+            text-align: right;
+            max-width: 60%;
+        }
+
+        .alamat {
+            margin-top: 8px;
+            font-size: 12px;
+            color: var(--text-muted);
+            text-align: left;
+            width: 100%;
+            background: #f8fafc;
+            padding: 8px;
+            border-radius: 6px;
+            line-height: 1.4;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-muted);
+            font-size: 13px;
+            border-top: 1px solid #e2e8f0;
+            background: white;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- LOGO ANGKATAN -->
+    <header>
+        <img src="assets/Logo-Angkatan.jpg" alt="Logo Angkatan Geomatika 23" onerror="this.src='https://via.placeholder.com/130?text=LOGO'">
+        <h1>Teknik Geomatika 23</h1>
+        <p>Direktori Biodata Resmi Mahasiswa Teknik Geomatika Angkatan 2023</p>
+    </header>
+
+    <!-- KOTAK PENCARIAN -->
+    <div class="search-container">
+        <input type="text" id="searchInput" class="search-input" placeholder="Cari berdasarkan nama atau NIM..." onkeyup="filterData()">
+    </div>
+
+    <!-- KONTEN MAHASISWA -->
+    <div class="container" id="member-container">
+        <p style="grid-column: 1 / -1; text-align: center; color: var(--text-muted);">Memuat data mahasiswa...</p>
+    </div>
+
+    <footer>
+        &copy; 2026 Teknik Geomatika 23 | Dibuat dan disesuaikan oleh 123230055 dan 123230070
+    </footer>
+
+    <script>
+        let allMembers = [];
+
+        async function loadDatabase() {
+            try {
+                let response = await fetch('data/database2.csv'); // Sesuaikan jika nama file Anda database.csv atau database2.csv
+                let text = await response.text();
+                
+                let rows = text.split('\n').filter(r => r.trim() !== '');
+                if (rows.length === 0) return;
+
+                for (let i = 1; i < rows.length; i++) {
+                    // Pemisah menggunakan titik koma (;) sesuai struktur asli file CSV
+                    let cols = rows[i].split(';').map(c => c.trim().replace(/^"|"$/g, ''));
+                    if (cols.length >= 6 && cols[1]) {
+                        allMembers.push({
+                            no: cols[0],
+                            nim: cols[1],
+                            nama: cols[2],
+                            prodi: cols[3],
+                            tpb: cols[4],
+                            alamat: cols[5] || '-'
+                        });
+                    }
+                }
+                displayMembers(allMembers);
+            } catch (error) {
+                console.error("Gagal memuat CSV:", error);
+                document.getElementById('member-container').innerHTML = `
+                    <p style="grid-column: 1 / -1; text-align: center; color: #ef4444;">
+                        Gagal memuat database. Pastikan file <b>database2.csv</b> ada di dalam folder <b>data/</b>.
+                    </p>`;
+            }
+        }
+
+        function displayMembers(members) {
+            let container = document.getElementById('member-container');
+            container.innerHTML = '';
+
+            if (members.length === 0) {
+                container.innerHTML = `<p style="grid-column: 1 / -1; text-align: center; color: var(--text-muted);">Data tidak ditemukan.</p>`;
+                return;
+            }
+
+            members.forEach(m => {
+                // Foto dipanggil berdasarkan NIM (contoh: assets/123230001.jpg)
+                let fotoPath = `assets/${m.nim}.jpg`;
+
+                let card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <img src="${fotoPath}" alt="${m.nama}" class="profile-img" onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'">
+                    <h3>${m.nama}</h3>
+                    <div class="nim">${m.nim}</div>
+                    
+                    <div class="info-group">
+                        <div class="info-row">
+                            <span class="info-label">Prodi</span>
+                            <span class="info-value">${m.prodi}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Kelas TPB</span>
+                            <span class="info-value">${m.tpb}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="alamat">
+                        📍 <b>Alamat Asal:</b><br>${m.alamat}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function filterData() {
+            let keyword = document.getElementById('searchInput').value.toLowerCase();
+            let filtered = allMembers.filter(m => 
+                m.nama.toLowerCase().includes(keyword) || m.nim.toLowerCase().includes(keyword)
+            );
+            displayMembers(filtered);
+        }
+
+        loadDatabase();
+    </script>
+</body>
+</html>
